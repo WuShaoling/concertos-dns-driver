@@ -1,2 +1,2 @@
 service dnsmasq start
-/usr/bin/dns-driver &
+/usr/bin/dns-driver
