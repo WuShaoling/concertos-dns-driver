@@ -6,9 +6,9 @@ RUN apt-get update
 RUN apt-get install -y dnsmasq
 
 COPY ./config/* /etc/
-COPY ./dns-driver /usr/bin
+COPY ./dns-driver /usr/bin/
 
 EXPOSE 8082
 EXPOSE 53
 
-ENTRYPOINT service dnsmasq start
+ENTRYPOINT sh /etc/start.sh
