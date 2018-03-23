@@ -7,6 +7,9 @@ import (
 	"io"
 	"log"
 	"strings"
+	"bytes"
+	"errors"
+	"os/exec"
 )
 
 type Executor struct {
@@ -54,6 +57,8 @@ func (exec *Executor) DeleteRecord(domain string) error {
 	}
 	f.Close()
 
+	err = exec.restartDnsmasq()
+
 	return err
 }
 
@@ -65,7 +70,25 @@ func (exec *Executor) AddRecord(domainip string) error {
 		panic(err)
 	}
 	f.WriteString("\n" + domainip)
+
+	err = exec.restartDnsmasq()
 	return err
+}
+
+func (exe *Executor) restartDnsmasq() error {
+	cmd := exec.Command("/bin/bash", "-c", " sudo service dnsmasq restart")
+
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+
+	err := cmd.Run()
+	if nil != err {
+		log.Println(err)
+		return errors.New(string(out.Bytes()))
+	}
+	log.Println("RestartDnsmasq : ", string(out.Bytes()))
+	return nil
 }
 
 var once2 sync.Once

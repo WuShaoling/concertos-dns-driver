@@ -8,6 +8,8 @@ RUN apt-get install -y dnsmasq
 COPY ./config/* /etc/
 COPY ./dns-driver /usr/bin/
 
+RUN chmod a+x /usr/bin/dns-driver
+
 EXPOSE 8082
 EXPOSE 53
 
