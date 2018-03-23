@@ -12,7 +12,7 @@ import (
 type Executor struct {
 }
 
-const DNS_CONFIG_PATH = "/etc/hosts"
+const DNS_CONFIG_PATH = "/etc/dnsmasq.hosts"
 
 func (exec *Executor) DeleteRecord(domain string) error {
 	// read from file
