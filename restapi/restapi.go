@@ -11,9 +11,12 @@ import (
 func (rest *RestApi) Start() {
 	ws := new(restful.WebService)
 	ws.Path("/domain").Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON)
+
 	ws.Route(ws.PUT("/add").To(rest.addDomain))
 	ws.Route(ws.DELETE("/delete/{domain}").To(rest.deleteDmain))
+
 	restful.DefaultContainer.Add(ws)
+
 	log.Printf("Start rest api, listening on localhost:80")
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }

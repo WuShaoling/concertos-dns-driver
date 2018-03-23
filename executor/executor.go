@@ -76,7 +76,7 @@ func (exec *Executor) AddRecord(domainip string) error {
 }
 
 func (exe *Executor) restartDnsmasq() error {
-	cmd := exec.Command("/bin/bash", "-c", " sudo service dnsmasq restart")
+	cmd := exec.Command("/bin/bash", "-c", " service dnsmasq restart")
 
 	var out bytes.Buffer
 	cmd.Stdout = &out
