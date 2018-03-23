@@ -17,7 +17,7 @@ func (rest *RestApi) Start() {
 
 	restful.DefaultContainer.Add(ws)
 
-	log.Printf("Start rest api, listening on localhost:80")
+	log.Printf("Start rest api, listening on localhost:8082")
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }
 

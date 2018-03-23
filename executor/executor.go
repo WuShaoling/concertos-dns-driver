@@ -16,6 +16,7 @@ type Executor struct {
 }
 
 const DNS_CONFIG_PATH = "/etc/dnsmasq.hosts"
+//const DNS_CONFIG_PATH = "a.txt"
 
 func (exec *Executor) DeleteRecord(domain string) error {
 	// read from file
