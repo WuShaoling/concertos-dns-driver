@@ -21,7 +21,7 @@ func (rest *RestApi) Start() {
 func (rest *RestApi) addDomain(request *restful.Request, response *restful.Response) {
 	var doip = new(DomainIP)
 	request.ReadEntity(doip)
-	domainip := doip.Domain + " " + doip.IP
+	domainip := doip.IP + " " + doip.Domain
 	log.Println(domainip)
 
 	if err := rest.executor.AddRecord(domainip); nil != err {
