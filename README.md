@@ -8,7 +8,7 @@ written in go language
 2. docker build . -t dns-driver:latest
 
 ### Run(docker)
- docker run -d --net=host --dns=202.96.209.5 dns-driver:latest
+ docker run -d --name dnsmasq --net=host --dns=223.5.5.5 --dns=223.6.6.6  dns-driver:latest
 
 ### Restapi
 
