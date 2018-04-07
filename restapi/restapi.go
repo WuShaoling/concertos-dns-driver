@@ -12,18 +12,19 @@ func (rest *RestApi) Start() {
 	ws := new(restful.WebService)
 	ws.Path("/domain").Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON)
 
-	ws.Route(ws.PUT("/add").To(rest.addDomain))
-	ws.Route(ws.DELETE("/delete/{domain}").To(rest.deleteDmain))
+	ws.Route(ws.PUT("/").To(rest.addDomain))
+	ws.Route(ws.DELETE("/{domain}").To(rest.deleteDmain))
+	ws.Route(ws.GET("/").To(rest.getAll))
 
 	restful.DefaultContainer.Add(ws)
 
-	log.Printf("Start rest api, listening on localhost:8082")
-	log.Fatal(http.ListenAndServe(":8082", nil))
+	log.Printf("Start rest api, listening on localhost:40001")
+	log.Fatal(http.ListenAndServe(":40001", nil))
 }
 
 func (rest *RestApi) addDomain(request *restful.Request, response *restful.Response) {
 	var doip = new(DomainIP)
-	request.ReadEntity(doip)
+	log.Println(request.ReadEntity(doip))
 	domainip := doip.IP + " " + doip.Domain
 	log.Println(domainip)
 
@@ -35,10 +36,18 @@ func (rest *RestApi) addDomain(request *restful.Request, response *restful.Respo
 }
 
 func (rest *RestApi) deleteDmain(request *restful.Request, response *restful.Response) {
-	if err := rest.executor.DeleteRecord(request.PathParameter("domain-ip")); nil != err {
+	if err := rest.executor.DeleteRecord(request.PathParameter("domain")); nil != err {
 		response.WriteError(http.StatusInternalServerError, err)
 	} else {
 		response.WriteHeader(http.StatusOK)
+	}
+}
+
+func (rest *RestApi) getAll(request *restful.Request, response *restful.Response) {
+	if lines, err := rest.executor.ReadLines(); nil != err {
+		response.WriteError(http.StatusInternalServerError, err)
+	} else {
+		response.WriteEntity(lines)
 	}
 }
 

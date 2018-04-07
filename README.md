@@ -8,22 +8,30 @@ written in go language
 2. docker build . -t dns-driver:latest
 
 ### Run(docker)
-docker run -d -p 8082:8082 -p 53:53 dns-driver:latest
+ docker run -d --net=host --dns=202.96.209.5 dns-driver:latest
 
 ### Restapi
 
 1. ADD :
-    http://localhost:8082/domain/add
+    http://localhost:40001/domain/
 
     ```
-    PUT /domain/add HTTP/1.1
+    PUT /domain/ HTTP/1.1
     Content-Length: 43
-    Host: localhost:8082
+    Host: localhost:40001
     Content-Type: application/json
     
-    {"IP":"127.0.0.1", "Domain":"foo.com"}
+    {"IP":"127.0.0.1", "Domain":"localhost"}
     ```
     
 2. DELETE :
-    http://localhost:8082/domain/delete/{domain-name}
+    http://localhost:40001/domain/{domain-name}
+    ```
+    DELETE /domain/ HTTP/1.1
+    ```
 
+4. GETALL :
+    http://localhost:40001/domain/
+    ```
+    GET /domain/ HTTP/1.1
+    ```

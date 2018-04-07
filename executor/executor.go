@@ -6,39 +6,47 @@ import (
 	"bufio"
 	"io"
 	"log"
-	"strings"
 	"bytes"
 	"errors"
 	"os/exec"
+	"strings"
 )
 
 type Executor struct {
 }
 
 const DNS_CONFIG_PATH = "/etc/dnsmasq.hosts"
-//const DNS_CONFIG_PATH = "a.txt"
 
-func (exec *Executor) DeleteRecord(domain string) error {
-	// read from file
+func (exec *Executor) ReadLines() ([]string, error) {
+
 	var lines []string
-	f, err := os.OpenFile(DNS_CONFIG_PATH, os.O_RDONLY, 0666)
+
+	fi, err := os.Open(DNS_CONFIG_PATH)
 	if err != nil {
-		log.Println(err)
-		f.Close()
-		return err
+		return nil, err
 	}
-	rd := bufio.NewReader(f)
+	defer fi.Close()
+
+	br := bufio.NewReader(fi)
 	for {
-		line, err := rd.ReadString('\n')
-		if err != nil || io.EOF == err {
+		a, _, c := br.ReadLine()
+		if c == io.EOF {
 			break
 		}
-		if strings.Contains(line, domain) {
-			continue
+		if len(a) != 0 {
+			lines = append(lines, string(a))
 		}
-		lines = append(lines, line)
 	}
-	f.Close()
+
+	return lines, nil
+}
+
+func (exec *Executor) DeleteRecord(domain string) error {
+	// read all
+	lines, err := exec.ReadLines()
+	if err != nil {
+		return err
+	}
 
 	// delete file
 	if err = os.Remove(DNS_CONFIG_PATH); nil != err {
@@ -47,17 +55,19 @@ func (exec *Executor) DeleteRecord(domain string) error {
 	}
 
 	// create and write to file
-	f, err = os.OpenFile(DNS_CONFIG_PATH, os.O_WRONLY|os.O_CREATE, 0777)
+	f, err := os.OpenFile(DNS_CONFIG_PATH, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
-		log.Println(err)
-		f.Close()
 		return err
 	}
+	defer f.Close()
 	for _, v := range lines {
-		f.WriteString(v)
+		if strings.Contains(v, domain) {
+			continue
+		}
+		f.WriteString(v + "\n")
 	}
-	f.Close()
 
+	// restart dnsmasq
 	err = exec.restartDnsmasq()
 
 	return err
@@ -65,11 +75,10 @@ func (exec *Executor) DeleteRecord(domain string) error {
 
 func (exec *Executor) AddRecord(domainip string) error {
 	f, err := os.OpenFile(DNS_CONFIG_PATH, os.O_WRONLY|os.O_APPEND, 0666)
-	defer f.Close()
 	if nil != err {
 		log.Println(err)
-		panic(err)
 	}
+	defer f.Close()
 	f.WriteString("\n" + domainip)
 
 	err = exec.restartDnsmasq()
